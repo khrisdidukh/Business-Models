@@ -149,6 +149,35 @@
 
   .hidden { display:none !important; }
 
+  /* CLAUDE STAGES */
+  .stages { display:flex; flex-direction:column; gap:14px; }
+  .stage { background:var(--card); border:1px solid var(--card-border); border-radius:16px; overflow:hidden; transition:all 0.2s; }
+  .stage.open { border-color:rgba(168,130,255,0.4); }
+  .stage-head { display:flex; align-items:center; gap:14px; padding:18px 20px; cursor:pointer; transition:background 0.2s; }
+  .stage-head:hover { background:rgba(255,255,255,0.03); }
+  .stage-num { width:34px; height:34px; border-radius:50%; background:rgba(168,130,255,0.15); color:#c4a8ff; font-family:'Playfair Display',serif; font-weight:800; font-size:16px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .stage-titlewrap { flex:1; }
+  .stage-title { font-family:'Playfair Display',serif; font-size:17px; font-weight:700; color:#fff; }
+  .stage-sub { font-size:12px; color:var(--muted); margin-top:2px; }
+  .stage-arrow { color:var(--muted); font-size:18px; transition:transform 0.3s; }
+  .stage.open .stage-arrow { transform:rotate(180deg); }
+  .stage-body { max-height:0; overflow:hidden; transition:max-height 0.4s ease; }
+  .stage.open .stage-body { max-height:3000px; }
+  .stage-inner { padding:0 20px 20px; }
+  .stage-howto { background:rgba(168,130,255,0.07); border-radius:12px; padding:14px 16px; margin-bottom:16px; }
+  .stage-howto-title { font-size:11px; color:#c4a8ff; letter-spacing:1px; font-weight:600; margin-bottom:8px; }
+  .step-item { display:flex; gap:10px; margin-bottom:8px; font-size:13px; color:var(--text); line-height:1.5; }
+  .step-item:last-child { margin-bottom:0; }
+  .step-n { color:#c4a8ff; font-weight:700; flex-shrink:0; }
+  .prompts-title { font-size:11px; color:var(--gold); letter-spacing:1px; font-weight:600; margin-bottom:10px; }
+  .prompt-card { background:rgba(0,0,0,0.25); border:1px solid rgba(255,255,255,0.08); border-radius:11px; padding:13px 15px; margin-bottom:10px; position:relative; }
+  .prompt-label { font-size:11px; color:var(--gold); font-weight:600; margin-bottom:6px; }
+  .prompt-text { font-size:13px; color:rgba(255,255,255,0.78); line-height:1.5; font-family:'DM Sans',sans-serif; font-style:italic; padding-right:60px; }
+  .copy-btn { position:absolute; top:11px; right:11px; background:rgba(255,200,80,0.12); border:1px solid var(--gold-border); color:var(--gold); font-size:11px; padding:4px 10px; border-radius:7px; cursor:pointer; font-family:'DM Sans',sans-serif; transition:all 0.2s; }
+  .copy-btn:hover { background:rgba(255,200,80,0.25); }
+  .copy-btn.copied { background:var(--green); border-color:var(--green); color:#000; }
+  .tab-btn.active#tab-btn-claude { background:rgba(168,130,255,0.18); border-color:rgba(168,130,255,0.4); color:#c4a8ff; }
+
   @media (max-width:600px) {
     .header { padding:14px 16px; } .main { padding:18px 16px; }
     .modal { padding:20px; } .modal-pros-cons { grid-template-columns:1fr; }
@@ -168,6 +197,7 @@
     <button class="tab-btn active" id="tab-btn-build" onclick="showTab('build')">🏗️ Я будую бізнес</button>
     <button class="tab-btn" id="tab-btn-invest" onclick="showTab('invest')">📈 Я інвестую</button>
     <button class="tab-btn" id="tab-btn-quiz" onclick="showTab('quiz')">🎯 Підібрати мені</button>
+    <button class="tab-btn" id="tab-btn-claude" onclick="showTab('claude')">🤖 Як Claude допоможе</button>
   </div>
 </div>
 
@@ -218,6 +248,12 @@
       </div>
     </div>
     <div class="quiz-wrap hidden" id="quiz-active"><div id="quiz-inner"></div></div>
+  </div>
+
+  <!-- CLAUDE TAB -->
+  <div id="tab-claude" class="hidden">
+    <div class="intro">Claude — це твій помічник на <b>кожному етапі побудови бізнесу</b>. Нижче — 6 етапів від ідеї до масштабу. Натисни на етап, щоб побачити <b>покрокову інструкцію</b> і <b>готові промпти</b>, які можна одразу копіювати й вставляти в Claude.</div>
+    <div class="stages" id="stages-wrap"></div>
   </div>
 
 </div>
@@ -571,12 +607,13 @@ let filters={ build:{cat:'Всі',entry:0}, invest:{cat:'Всі',entry:0} };
 
 function showTab(t){
   activeTab=t;
-  ['build','invest','quiz'].forEach(x=>document.getElementById('tab-'+x).classList.toggle('hidden',x!==t));
+  ['build','invest','quiz','claude'].forEach(x=>document.getElementById('tab-'+x).classList.toggle('hidden',x!==t));
   document.getElementById('tab-btn-build').classList.toggle('active',t==='build');
   document.getElementById('tab-btn-invest').classList.remove('active');
   document.getElementById('tab-btn-invest').classList.add('invest');
   document.getElementById('tab-btn-invest').classList.toggle('active',t==='invest');
   document.getElementById('tab-btn-quiz').classList.toggle('active',t==='quiz');
+  document.getElementById('tab-btn-claude').classList.toggle('active',t==='claude');
   if(t==='quiz'){ resetQuizPath(); }
 }
 
@@ -738,9 +775,119 @@ function renderResults(){
     </div>`;
 }
 
+// ---- CLAUDE STAGES ----
+const STAGES = [
+  { num:"1", title:"Ідея та валідація", sub:"Перевірити, чи варта ідея взагалі",
+    steps:[
+      "Опиши Claude свою сиру ідею — навіть якщо вона ще нечітка.",
+      "Попроси розкласти її: яку проблему вирішуєш, для кого, чому це купуватимуть.",
+      "Попроси знайти слабкі місця й ризики, поки ти не вклав(ла) грошей.",
+      "Згенеруй список питань для 10 потенційних клієнтів, щоб перевірити попит."
+    ],
+    prompts:[
+      {label:"Розбір ідеї", text:"У мене є ідея: [опиши ідею]. Допоможи розкласти її — яку проблему вона вирішує, хто цільова аудиторія, як на цьому заробляти і які головні ризики. Будь критичним."},
+      {label:"Перевірка попиту", text:"Склади 10 питань для інтерв'ю з потенційними клієнтами, щоб перевірити, чи справді їм потрібен мій продукт: [продукт]. Питання мають виявляти реальну проблему, а не підлещуватися."}
+    ]},
+  { num:"2", title:"Дослідження ринку", sub:"Зрозуміти ринок, конкурентів і нішу",
+    steps:[
+      "Попроси Claude проаналізувати ринок і його розмір у твоїй ніші.",
+      "Дай список конкурентів (або попроси знайти) — і отримай порівняння їхніх сильних/слабких сторін.",
+      "Знайди свою унікальну позицію — чим ти будеш відрізнятися.",
+      "Визнач сегменти аудиторії й хто з них найприбутковіший для старту."
+    ],
+    prompts:[
+      {label:"Аналіз конкурентів", text:"Проаналізуй конкурентів у ніші [ніша]. Зроби таблицю: назва, сильні сторони, слабкі сторони, ціновий сегмент. У кінці підкажи, де є вільна ніша для мене."},
+      {label:"Позиціювання", text:"Мій продукт: [опис]. Допоможи сформулювати унікальну торгову пропозицію (УТП) — одне чітке речення, чому клієнт обере саме мене, а не конкурентів."}
+    ]},
+  { num:"3", title:"Бізнес-план і фінмодель", sub:"Прорахувати цифри й стратегію",
+    steps:[
+      "Попроси Claude скласти структуру бізнес-плану під твою модель.",
+      "Дай свої вхідні цифри (ціна, витрати) — і отримай фінмодель у таблиці.",
+      "Прорахуй точку беззбитковості: скільки треба продати, щоб вийти в нуль.",
+      "Попроси кілька сценаріїв: песимістичний, реалістичний, оптимістичний."
+    ],
+    prompts:[
+      {label:"Фінмодель (Excel)", text:"Зроби фінансову модель у таблиці для бізнесу: [опис]. Вхідні: ціна продукту [X], собівартість [Y], постійні витрати на місяць [Z]. Порахуй точку беззбитковості й прогноз прибутку на 12 місяців. Віддай як Excel-файл."},
+      {label:"Unit-економіка", text:"Допоможи порахувати unit-економіку: скільки я заробляю/втрачаю на одному клієнті з урахуванням вартості залучення (CAC) і життєвої цінності (LTV). Мої дані: [дані]."}
+    ]},
+  { num:"4", title:"Бренд і маркетинг", sub:"Назва, меседжі, перші продажі",
+    steps:[
+      "Згенеруй варіанти назв, слоганів і концепцію бренду.",
+      "Попроси контент-план для соцмереж на місяць наперед.",
+      "Створи готові тексти: пости, холодні листи, опис продукту.",
+      "Зроби лендінг або структуру сайту під твою пропозицію."
+    ],
+    prompts:[
+      {label:"Контент-план", text:"Зроби контент-план на 30 днів для [Instagram/інша мережа] для бізнесу [опис]. Для кожного дня: тема, формат (пост/reels/сторіз) і коротка ідея. Тон: [твій тон]."},
+      {label:"Холодні листи", text:"Напиши 3 варіанти холодного листа потенційним B2B-клієнтам [тип клієнта]. Коротко, без води, з чітким наступним кроком. Я продаю: [продукт]."},
+      {label:"Опис продукту", text:"Напиши продаючий опис мого продукту [продукт] для сайту/маркетплейсу. Зроби акцент на вигодах для клієнта, а не на характеристиках."}
+    ]},
+  { num:"5", title:"Запуск і продажі", sub:"Перші клієнти й операційка",
+    steps:[
+      "Підключи Gmail/Drive як конектори — Claude працюватиме з реальними листами й документами.",
+      "Попроси скласти скрипти продажів і відповіді на типові заперечення.",
+      "Автоматизуй рутину: відповіді клієнтам, рахунки, комерційні пропозиції.",
+      "Створи CRM-таблицю для відстеження угод і нагадувань."
+    ],
+    prompts:[
+      {label:"Відповіді на заперечення", text:"Склади відповіді на 7 найчастіших заперечень клієнтів для мого продукту [продукт]: «дорого», «треба подумати», «у конкурентів дешевше» тощо. Тон — впевнений, але не нав'язливий."},
+      {label:"Комерційна пропозиція", text:"Зроби шаблон комерційної пропозиції для [тип клієнта]. Структура: проблема клієнта, моє рішення, що входить, ціна, наступний крок. Віддай як документ."}
+    ]},
+  { num:"6", title:"Масштаб і оптимізація", sub:"Зростання, команда, системи",
+    steps:[
+      "Проаналізуй, що працює, а що ні — на основі твоїх реальних даних.",
+      "Попроси Claude описати процеси, щоб делегувати їх команді.",
+      "Створи Skill (інструкцію), щоб Claude робив повторювані задачі однаково.",
+      "Розроби стратегію виходу на нові ринки чи продукти."
+    ],
+    prompts:[
+      {label:"Опис процесу для команди", text:"Допоможи описати процес [який процес] як покрокову інструкцію (SOP), щоб новий співробітник міг виконати його без мене. Зроби чітко й по кроках."},
+      {label:"Стратегія зростання", text:"Мій бізнес зараз: [поточний стан і цифри]. Запропонуй 3 конкретні стратегії зростання на наступні 6 місяців з оцінкою зусиль і потенційного результату кожної."}
+    ]},
+];
+
+let openStage = null;
+function renderStages(){
+  document.getElementById('stages-wrap').innerHTML = STAGES.map((s,i)=>`
+    <div class="stage${i===openStage?' open':''}" id="stage-${i}">
+      <div class="stage-head" onclick="toggleStage(${i})">
+        <div class="stage-num">${s.num}</div>
+        <div class="stage-titlewrap"><div class="stage-title">${s.title}</div><div class="stage-sub">${s.sub}</div></div>
+        <div class="stage-arrow">⌄</div>
+      </div>
+      <div class="stage-body"><div class="stage-inner">
+        <div class="stage-howto">
+          <div class="stage-howto-title">📋 ЯК ЦЕ ЗРОБИТИ ПОКРОКОВО</div>
+          ${s.steps.map((st,n)=>`<div class="step-item"><span class="step-n">${n+1}.</span><span>${st}</span></div>`).join('')}
+        </div>
+        <div class="prompts-title">✨ ГОТОВІ ПРОМПТИ — КОПІЮЙ І ВСТАВЛЯЙ У CLAUDE</div>
+        ${s.prompts.map((p,pi)=>`
+          <div class="prompt-card">
+            <div class="prompt-label">${p.label}</div>
+            <div class="prompt-text" id="prompt-${i}-${pi}">${p.text}</div>
+            <button class="copy-btn" onclick="copyPrompt(${i},${pi},this)">Копіювати</button>
+          </div>`).join('')}
+      </div></div>
+    </div>`).join('');
+}
+function toggleStage(i){ openStage = openStage===i?null:i; renderStages(); }
+function copyPrompt(i,pi,btn){
+  const text = STAGES[i].prompts[pi].text;
+  const done = ()=>{ btn.textContent='✓ Скопійовано'; btn.classList.add('copied'); setTimeout(()=>{btn.textContent='Копіювати';btn.classList.remove('copied');},1600); };
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(done).catch(()=>fallbackCopy(text,done));
+  } else { fallbackCopy(text,done); }
+}
+function fallbackCopy(text,cb){
+  const ta=document.createElement('textarea'); ta.value=text; ta.style.position='fixed'; ta.style.opacity='0';
+  document.body.appendChild(ta); ta.select();
+  try{ document.execCommand('copy'); cb(); }catch(e){} document.body.removeChild(ta);
+}
+
 // INIT
 buildFilters('build'); renderGrid('build');
 buildFilters('invest'); renderGrid('invest');
+renderStages();
 </script>
 </body>
 </html>
