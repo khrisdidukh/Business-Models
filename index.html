@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Бізнес-моделі та інвестиції — Воркшоп</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=DM+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold:#FFC850; --gold-dim:rgba(255,200,80,0.15); --gold-border:rgba(255,200,80,0.35);
+    --teal:#5eead4; --teal-dim:rgba(94,234,212,0.13); --teal-border:rgba(94,234,212,0.35);
+    --bg:#0d0d1a; --bg2:#1a0d2e; --bg3:#0d1a2e;
+    --card:rgba(255,255,255,0.04); --card-border:rgba(255,255,255,0.09);
+    --text:rgba(255,255,255,0.85); --muted:rgba(255,255,255,0.4);
+    --green:#4ade80; --red:#f87171; --blue:#60a5fa;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:linear-gradient(135deg,var(--bg) 0%,var(--bg2) 50%,var(--bg3) 100%); min-height:100vh; font-family:'DM Sans',sans-serif; color:#fff; }
+  ::-webkit-scrollbar { width:5px; } ::-webkit-scrollbar-thumb { background:var(--gold-border); border-radius:3px; }
+
+  .header { border-bottom:1px solid rgba(255,255,255,0.07); padding:18px 28px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:14px; position:sticky; top:0; background:rgba(13,13,26,0.92); backdrop-filter:blur(12px); z-index:50; }
+  .header-title { font-family:'Playfair Display',serif; font-size:22px; font-weight:800; letter-spacing:-0.5px; }
+  .header-title span { color:var(--gold); }
+  .header-sub { font-size:12px; color:var(--muted); margin-top:2px; }
+  .tabs { display:flex; gap:8px; flex-wrap:wrap; }
+  .tab-btn { background:var(--card); border:1px solid var(--card-border); color:var(--muted); padding:8px 16px; border-radius:50px; cursor:pointer; font-size:13px; font-family:'DM Sans',sans-serif; font-weight:500; transition:all 0.2s; }
+  .tab-btn.active { background:var(--gold-dim); border-color:var(--gold-border); color:var(--gold); }
+  .tab-btn.active.invest { background:var(--teal-dim); border-color:var(--teal-border); color:var(--teal); }
+  .tab-btn:hover:not(.active) { background:rgba(255,255,255,0.08); }
+
+  .main { padding:24px 28px; max-width:1140px; margin:0 auto; }
+  .intro { font-size:13px; color:var(--muted); line-height:1.6; margin-bottom:20px; max-width:720px; }
+  .intro b { color:var(--text); }
+
+  .filters { display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:18px; }
+  .filter-btn { background:var(--card); border:1px solid var(--card-border); color:var(--muted); padding:5px 13px; border-radius:50px; cursor:pointer; font-size:12px; font-family:'DM Sans',sans-serif; transition:all 0.2s; }
+  .filter-btn.active { background:var(--gold-dim); border-color:var(--gold-border); color:var(--gold); }
+  .filter-btn.active.invest { background:var(--teal-dim); border-color:var(--teal-border); color:var(--teal); }
+  .filter-btn:hover:not(.active) { border-color:rgba(255,255,255,0.25); color:rgba(255,255,255,0.7); }
+  .filter-range { display:flex; align-items:center; gap:8px; margin-left:auto; }
+  .filter-range label { font-size:12px; color:var(--muted); }
+  input[type=range] { accent-color:var(--gold); width:80px; cursor:pointer; }
+  .filter-range span { font-size:12px; color:var(--gold); width:30px; }
+
+  .legend { display:flex; gap:18px; flex-wrap:wrap; margin-bottom:18px; }
+  .legend-item { display:flex; align-items:center; gap:6px; }
+  .legend-dot { width:10px; height:10px; border-radius:3px; flex-shrink:0; }
+  .legend-text { font-size:11px; color:var(--muted); }
+
+  .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:14px; }
+  .grid-hint { margin-top:14px; font-size:12px; color:rgba(255,255,255,0.2); text-align:center; }
+
+  .model-card { background:var(--card); border:1px solid var(--card-border); border-radius:16px; padding:18px; cursor:pointer; transition:all 0.2s; display:flex; flex-direction:column; gap:10px; animation:fadeUp 0.3s ease both; }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(8px);} to{opacity:1;transform:translateY(0);} }
+  .model-card:hover { background:rgba(255,255,255,0.08); border-color:var(--gold-border); transform:translateY(-2px); box-shadow:0 8px 24px rgba(0,0,0,0.3); }
+  .model-card.invest:hover { border-color:var(--teal-border); }
+  .card-top { display:flex; align-items:center; gap:10px; }
+  .card-emoji { font-size:28px; line-height:1; }
+  .card-name { font-family:'Playfair Display',serif; font-size:15px; font-weight:700; color:#fff; }
+  .card-cat { font-size:11px; color:var(--gold); opacity:0.85; margin-top:2px; }
+  .card-cat.invest { color:var(--teal); }
+  .card-tagline { font-size:12px; color:rgba(255,255,255,0.55); line-height:1.5; }
+  .card-money { font-size:11px; color:var(--text); background:rgba(255,255,255,0.05); padding:5px 9px; border-radius:7px; display:inline-block; }
+  .bars { display:flex; flex-direction:column; gap:6px; }
+  .bar-row { display:flex; align-items:center; gap:8px; }
+  .bar-label { font-size:10px; color:var(--muted); width:100px; flex-shrink:0; }
+  .bar-dots { display:flex; gap:3px; }
+  .dot { width:15px; height:7px; border-radius:3px; background:rgba(255,255,255,0.1); transition:background 0.3s; }
+  .dot.on-green{background:var(--green);} .dot.on-red{background:var(--red);} .dot.on-gold{background:var(--gold);} .dot.on-blue{background:var(--blue);} .dot.on-teal{background:var(--teal);}
+
+  .overlay { position:fixed; inset:0; background:rgba(0,0,0,0.78); display:flex; align-items:center; justify-content:center; z-index:200; padding:20px; animation:fadeIn 0.2s ease; }
+  @keyframes fadeIn { from{opacity:0;} to{opacity:1;} }
+  .modal { background:#16162a; border:1px solid var(--gold-border); border-radius:24px; padding:28px; max-width:540px; width:100%; max-height:88vh; overflow-y:auto; animation:slideUp 0.25s ease; }
+  .modal.invest { border-color:var(--teal-border); }
+  @keyframes slideUp { from{transform:translateY(16px);opacity:0;} to{transform:translateY(0);opacity:1;} }
+  .modal-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:18px; }
+  .modal-title-wrap { display:flex; align-items:center; gap:12px; }
+  .modal-emoji { font-size:38px; }
+  .modal-name { font-family:'Playfair Display',serif; font-size:21px; font-weight:700; }
+  .modal-cat { font-size:12px; color:var(--gold); margin-top:2px; }
+  .modal-cat.invest { color:var(--teal); }
+  .close-btn { background:none; border:none; color:var(--muted); font-size:22px; cursor:pointer; line-height:1; padding:4px; }
+  .close-btn:hover { color:#fff; }
+  .modal-desc { font-size:14px; color:var(--text); line-height:1.6; margin-bottom:16px; }
+  .info-block { border-radius:10px; padding:11px 14px; margin-bottom:12px; }
+  .info-money { background:rgba(96,165,250,0.1); }
+  .info-forwho { background:rgba(74,222,128,0.09); }
+  .info-start { background:rgba(255,200,80,0.08); }
+  .info-mistake { background:rgba(248,113,113,0.09); }
+  .info-label { font-size:10px; letter-spacing:1px; margin-bottom:4px; font-weight:600; }
+  .info-money .info-label{color:var(--blue);} .info-forwho .info-label{color:var(--green);} .info-start .info-label{color:var(--gold);} .info-mistake .info-label{color:var(--red);}
+  .info-text { font-size:13px; color:var(--text); line-height:1.5; }
+  .modal-examples-label { font-size:10px; color:var(--muted); letter-spacing:1px; margin:14px 0 5px; font-weight:600; }
+  .modal-examples-text { font-size:13px; color:rgba(255,255,255,0.7); margin-bottom:16px; }
+  .modal-pros-cons { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:18px; }
+  .pros-title { font-size:12px; color:var(--green); margin-bottom:8px; font-weight:600; }
+  .cons-title { font-size:12px; color:var(--red); margin-bottom:8px; font-weight:600; }
+  .pc-item { font-size:12px; color:rgba(255,255,255,0.65); margin-bottom:5px; line-height:1.4; }
+  .modal-bars { display:flex; flex-direction:column; gap:8px; }
+  .modal-bar-row { display:flex; align-items:center; gap:10px; }
+  .modal-bar-label { font-size:12px; color:var(--muted); width:150px; flex-shrink:0; }
+
+  .quiz-wrap { max-width:560px; margin:0 auto; }
+  .quiz-progress-wrap { margin-bottom:28px; }
+  .quiz-progress-top { display:flex; justify-content:space-between; margin-bottom:8px; }
+  .quiz-progress-label { font-size:12px; color:var(--muted); }
+  .quiz-progress-pct { font-size:12px; color:var(--gold); }
+  .progress-bar { height:4px; background:rgba(255,255,255,0.1); border-radius:2px; }
+  .progress-fill { height:100%; background:var(--gold); border-radius:2px; transition:width 0.4s ease; }
+  .quiz-q-wrap { text-align:center; margin-bottom:28px; }
+  .quiz-emoji { font-size:48px; margin-bottom:12px; }
+  .quiz-question { font-family:'Playfair Display',serif; font-size:22px; color:#fff; line-height:1.4; }
+  .quiz-options { display:flex; flex-direction:column; gap:10px; }
+  .quiz-option { background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.11); color:#fff; padding:15px 18px; border-radius:13px; cursor:pointer; text-align:left; font-size:14px; font-family:'DM Sans',sans-serif; transition:all 0.18s; line-height:1.4; }
+  .quiz-option:hover { background:rgba(255,200,80,0.1); border-color:var(--gold-border); }
+  .quiz-option.selected { background:rgba(255,200,80,0.18); border-color:var(--gold); color:var(--gold); }
+  .quiz-back { margin-top:16px; background:none; border:none; color:var(--muted); cursor:pointer; font-size:13px; font-family:'DM Sans',sans-serif; }
+  .quiz-back:hover { color:rgba(255,255,255,0.6); }
+
+  .results-header { text-align:center; margin-bottom:28px; }
+  .results-emoji { font-size:44px; margin-bottom:8px; }
+  .results-title { font-family:'Playfair Display',serif; font-size:26px; color:#fff; }
+  .results-sub { font-size:13px; color:var(--muted); margin-top:6px; }
+  .results-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:14px; margin-bottom:28px; }
+  .result-card { background:var(--card); border:1px solid var(--card-border); border-radius:16px; padding:20px; position:relative; cursor:pointer; animation:fadeUp 0.3s ease both; transition:all 0.2s; }
+  .result-card:hover { background:rgba(255,255,255,0.08); transform:translateY(-2px); }
+  .result-card.top { background:rgba(255,200,80,0.08); border-color:var(--gold-border); }
+  .result-badge { position:absolute; top:-10px; right:-6px; background:var(--gold); color:#000; font-size:10px; font-weight:800; padding:3px 8px; border-radius:20px; }
+  .result-emoji { font-size:32px; margin-bottom:8px; }
+  .result-name { font-family:'Playfair Display',serif; font-size:15px; color:#fff; font-weight:700; margin-bottom:6px; }
+  .result-desc { font-size:12px; color:rgba(255,255,255,0.55); line-height:1.5; }
+  .results-btns { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+  .btn-secondary { background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.18); color:#fff; padding:10px 22px; border-radius:50px; cursor:pointer; font-size:13px; font-family:'DM Sans',sans-serif; transition:all 0.2s; }
+  .btn-secondary:hover { background:rgba(255,255,255,0.12); }
+  .btn-primary { background:var(--gold-dim); border:1px solid var(--gold-border); color:var(--gold); padding:10px 22px; border-radius:50px; cursor:pointer; font-size:13px; font-family:'DM Sans',sans-serif; transition:all 0.2s; }
+  .btn-primary:hover { background:rgba(255,200,80,0.25); }
+
+  .path-wrap { max-width:560px; margin:40px auto; text-align:center; }
+  .path-title { font-family:'Playfair Display',serif; font-size:26px; margin-bottom:8px; }
+  .path-sub { font-size:14px; color:var(--muted); margin-bottom:32px; }
+  .path-cards { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  .path-card { border-radius:20px; padding:32px 24px; cursor:pointer; transition:all 0.2s; border:1px solid var(--card-border); background:var(--card); }
+  .path-card:hover { transform:translateY(-3px); }
+  .path-card.build:hover { border-color:var(--gold-border); background:var(--gold-dim); }
+  .path-card.invest:hover { border-color:var(--teal-border); background:var(--teal-dim); }
+  .path-emoji { font-size:48px; margin-bottom:14px; }
+  .path-name { font-family:'Playfair Display',serif; font-size:20px; margin-bottom:8px; }
+  .path-desc { font-size:13px; color:var(--muted); line-height:1.5; }
+
+  .hidden { display:none !important; }
+
+  @media (max-width:600px) {
+    .header { padding:14px 16px; } .main { padding:18px 16px; }
+    .modal { padding:20px; } .modal-pros-cons { grid-template-columns:1fr; }
+    .quiz-question { font-size:18px; } .filter-range { margin-left:0; }
+    .path-cards { grid-template-columns:1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <div class="header-title">Бізнес-моделі <span>&amp; Інвестиції</span></div>
+    <div class="header-sub">Воркшоп: знайди свій спосіб робити гроші</div>
+  </div>
+  <div class="tabs">
+    <button class="tab-btn active" id="tab-btn-build" onclick="showTab('build')">🏗️ Я будую бізнес</button>
+    <button class="tab-btn" id="tab-btn-invest" onclick="showTab('invest')">📈 Я інвестую</button>
+    <button class="tab-btn" id="tab-btn-quiz" onclick="showTab('quiz')">🎯 Підібрати мені</button>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- BUILD TAB -->
+  <div id="tab-build">
+    <div class="intro">Це способи <b>будувати бізнес</b> — від найлегшого старту до капіталоємних. Натискай на категорії, щоб фільтрувати, і на картку — щоб побачити <b>скільки грошей реально треба</b>, для кого це, з чого почати і яку типову помилку роблять новачки.</div>
+    <div class="filters" id="filters-build"></div>
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div><span class="legend-text">Легкість входу</span></div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--red)"></div><span class="legend-text">Капітал</span></div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--gold)"></div><span class="legend-text">Потенціал масштабу</span></div>
+    </div>
+    <div class="grid" id="grid-build"></div>
+    <div class="grid-hint" id="hint-build"></div>
+  </div>
+
+  <!-- INVEST TAB -->
+  <div id="tab-invest" class="hidden">
+    <div class="intro">Це способи <b>інвестувати</b> — як примножувати капітал чужими руками. Від найбезпечніших (ETF, облігації) до найризикованіших (венчур, стартапи). Натискай на картку, щоб дізнатися <b>скільки треба на вхід</b>, який рівень ризику й хто типовий інвестор.</div>
+    <div class="filters" id="filters-invest"></div>
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div><span class="legend-text">Доступність (легкість входу)</span></div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--red)"></div><span class="legend-text">Капітал на вхід</span></div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--teal)"></div><span class="legend-text">Потенційна дохідність</span></div>
+    </div>
+    <div class="grid" id="grid-invest"></div>
+    <div class="grid-hint" id="hint-invest"></div>
+  </div>
+
+  <!-- QUIZ TAB -->
+  <div id="tab-quiz" class="hidden">
+    <div id="quiz-path" class="path-wrap">
+      <div class="path-title">З чого почнемо? 🤔</div>
+      <div class="path-sub">Обери напрям — і я підберу під тебе найкращі варіанти</div>
+      <div class="path-cards">
+        <div class="path-card build" onclick="startQuiz('build')">
+          <div class="path-emoji">🏗️</div>
+          <div class="path-name">Я хочу будувати</div>
+          <div class="path-desc">Створити свій бізнес, продукт чи справу</div>
+        </div>
+        <div class="path-card invest" onclick="startQuiz('invest')">
+          <div class="path-emoji">📈</div>
+          <div class="path-name">Я хочу інвестувати</div>
+          <div class="path-desc">Вкладати капітал і отримувати дохід</div>
+        </div>
+      </div>
+    </div>
+    <div class="quiz-wrap hidden" id="quiz-active"><div id="quiz-inner"></div></div>
+  </div>
+
+</div>
+
+<div class="overlay hidden" id="modal-overlay" onclick="closeModal()">
+  <div class="modal" id="modal-box" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-title-wrap">
+        <div class="modal-emoji" id="m-emoji"></div>
+        <div><div class="modal-name" id="m-name"></div><div class="modal-cat" id="m-cat"></div></div>
+      </div>
+      <button class="close-btn" onclick="closeModal()">✕</button>
+    </div>
+    <p class="modal-desc" id="m-desc"></p>
+    <div class="info-block info-money"><div class="info-label">💵 СКІЛЬКИ ТРЕБА НА СТАРТ</div><div class="info-text" id="m-money"></div></div>
+    <div class="info-block info-forwho"><div class="info-label">👤 ДЛЯ КОГО ЦЕ</div><div class="info-text" id="m-forwho"></div></div>
+    <div class="info-block info-start"><div class="info-label">🚀 З ЧОГО ПОЧАТИ</div><div class="info-text" id="m-start"></div></div>
+    <div class="info-block info-mistake"><div class="info-label">⚠️ ТИПОВА ПОМИЛКА НОВАЧКА</div><div class="info-text" id="m-mistake"></div></div>
+    <div class="modal-examples-label">ПРИКЛАДИ</div>
+    <div class="modal-examples-text" id="m-examples"></div>
+    <div class="modal-pros-cons">
+      <div><div class="pros-title">✅ Плюси</div><div id="m-pros"></div></div>
+      <div><div class="cons-title">⚠️ Мінуси</div><div id="m-cons"></div></div>
+    </div>
+    <div class="modal-bars" id="m-bars"></div>
+  </div>
+</div>
+
+<script>
+const BUILD = [
+  { id:"freelance", name:"Фриланс / Експертиза", emoji:"🧑‍💻", category:"Послуги", entry:1, capital:1, time:3, scale:2, b1:5,b2:1,b3:2,
+    tagline:"Продаєш свій час і навички напряму клієнту", money:"$0–500 (ноутбук + портфоліо)",
+    forwho:"Тим, хто має навичку (дизайн, тексти, код, маркетинг) і хоче почати заробляти вже завтра без вкладень.",
+    start:"Збери портфоліо з 3-5 робіт (можна безкоштовних), створи профіль на Upwork/Fiverr або напиши 10 потенційним клієнтам.",
+    mistake:"Демпінгувати ціну, щоб отримати клієнта. Краще менше клієнтів за нормальну ціну, ніж вигоряння за копійки.",
+    examples:"Дизайнер, копірайтер, розробник, SMM-фахівець, перекладач",
+    pros:["Старт майже з нуля","Гроші вже цього місяця","Повна свобода графіку"],
+    cons:["Дохід = твій час","Немає тебе — немає грошей","Нестабільність клієнтів"] },
+  { id:"coaching", name:"Коучинг / Консалтинг", emoji:"🎓", category:"Послуги", entry:2, capital:1, time:3, scale:3, b1:4,b2:1,b3:3,
+    tagline:"Продаєш свій досвід і трансформацію клієнта", money:"$100–1000 (сайт, навчання, сертифікація)",
+    forwho:"Експертам із досвідом, які вміють навчати й хочуть високого чеку за роботу 1-на-1 або в групах.",
+    start:"Визнач свою вузьку нішу й результат, який даєш. Проведи 5 безкоштовних сесій для відгуків, потім став ціну.",
+    mistake:"Бути «коучем для всіх». Чим вужча ніша — тим легше продавати й вищий чек.",
+    examples:"Бізнес-коуч, нутриціолог, кар'єрний консультант, фітнес-тренер",
+    pros:["Високий чек за годину","Будуєш особистий бренд","Можна вийти в групи/курси"],
+    cons:["Потрібна репутація","Емоційно затратно","Обмежено часом"] },
+  { id:"agency", name:"Агенція", emoji:"🏢", category:"Послуги", entry:2, capital:2, time:3, scale:3, b1:4,b2:2,b3:3,
+    tagline:"Команда надає послуги — ти продаєш і керуєш", money:"$1k–10k (перші зарплати до перших оплат)",
+    forwho:"Фрилансерам, які переросли себе й готові управляти людьми замість того, щоб робити все самим.",
+    start:"Знайди першого субпідрядника на повторювані задачі, виведи себе з виконання — у продажі та контроль якості.",
+    mistake:"Самому залишатися головним виконавцем. Тоді це не агенція, а ти з помічниками.",
+    examples:"Маркетингова, рекрутингова, дизайн-студія, event-агенція",
+    pros:["Масштаб через людей","B2B-контракти стабільні","Можна продати бізнес"],
+    cons:["Управління людьми","Маржа з'їдається ФОП","Утримання талантів"] },
+  { id:"shop", name:"Свій магазин (офлайн)", emoji:"🏪", category:"Торгівля", entry:3, capital:4, time:3, scale:3, b1:3,b2:4,b3:3,
+    tagline:"Фізична точка продажу товарів", money:"$10k–50k (оренда, ремонт, товар, персонал)",
+    forwho:"Тим, хто хоче відчутний бізнес із локацією й любить роботу з людьми та товаром наживо.",
+    start:"Протестуй попит онлайн або на маркеті ПЕРШ ніж орендувати приміщення. Локація вирішує 50% успіху.",
+    mistake:"Орендувати красиве приміщення до того, як перевірив, що товар взагалі купують.",
+    examples:"Магазин одягу, кав'ярня, квіткова крамниця, зоомагазин",
+    pros:["Відчутний бізнес","Лояльність району","Готівковий потік"],
+    cons:["Висока оренда й фікс-витрати","Прив'язка до локації","Складно масштабувати"] },
+  { id:"handmade", name:"Хендмейд / Крафт", emoji:"🎨", category:"Творчість", entry:1, capital:2, time:3, scale:2, b1:5,b2:2,b3:2,
+    tagline:"Робиш унікальні речі руками й продаєш", money:"$200–2000 (матеріали, інструменти, фото)",
+    forwho:"Творчим людям, які люблять робити речі руками й готові починати з малих обсягів.",
+    start:"Зроби першу партію, гарно сфотографуй, виставь на Etsy/Instagram. Продай 10 одиниць перш ніж масштабувати.",
+    mistake:"Не рахувати вартість свого часу в ціні. Хендмейд часто продають у збиток собі.",
+    examples:"Прикраси, кераміка, свічки, в'язані речі, мило",
+    pros:["Низький старт","Творча реалізація","Унікальність = вища ціна"],
+    cons:["Обмежено руками","Складно масштабувати","Низька маржа якщо не рахувати час"] },
+  { id:"ecommerce", name:"Інтернет-магазин / D2C", emoji:"🛒", category:"Торгівля", entry:3, capital:3, time:4, scale:4, b1:3,b2:3,b3:4,
+    tagline:"Продаєш товари онлайн напряму покупцю", money:"$3k–20k (товар, сайт, реклама)",
+    forwho:"Тим, хто хоче продавати фізичні товари без офлайн-точки й готовий розбиратися в digital-рекламі.",
+    start:"Обери 1 товар із попитом, зроби простий магазин (Shopify), запусти тестову рекламу на $200-300.",
+    mistake:"Закупити великий склад товару до того, як перевірив, що реклама окупається.",
+    examples:"D2C-бренд косметики, нішевий товар, дропшипінг",
+    pros:["Глобальний ринок","Без оренди приміщення","Масштаб через рекламу"],
+    cons:["Залежність від реклами","Логістика й повернення","Висока конкуренція"] },
+  { id:"production", name:"Виробництво", emoji:"🏭", category:"Виробництво", entry:4, capital:5, time:4, scale:4, b1:2,b2:5,b3:4,
+    tagline:"Виробляєш товар і продаєш оптом/в роздріб", money:"$20k–200k+ (обладнання, сировина, цех)",
+    forwho:"Тим, хто розуміє продукт і ринок, має доступ до капіталу й готовий до операційної складності.",
+    start:"Почни з контрактного виробництва (хтось виробляє під твоїм брендом), перш ніж будувати власний цех.",
+    mistake:"Купувати власне обладнання одразу. Спочатку аутсорс виробництва — менше ризику.",
+    examples:"Виробництво їжі, косметики, меблів, одягу, упаковки",
+    pros:["Контроль продукту й якості","Висока маржа при масштабі","Складно скопіювати"],
+    cons:["Великий капітал","Операційна складність","Повільний старт"] },
+  { id:"digital-product", name:"Цифровий продукт", emoji:"💻", category:"Продукт", entry:2, capital:2, time:4, scale:5, b1:4,b2:2,b3:5,
+    tagline:"Створюєш раз — продаєш безліч разів", money:"$500–5000 (час + інструменти + маркетинг)",
+    forwho:"Експертам і творцям, які хочуть пасивний дохід і готові спочатку інвестувати час у створення.",
+    start:"Спочатку продай ідею (передпродаж), потім створюй. Так перевіриш попит без даремної роботи.",
+    mistake:"Місяцями робити ідеальний продукт, який ніхто не чекає. Спершу попит — потім продукт.",
+    examples:"Онлайн-курс, шаблони, e-book, пресети, додаток",
+    pros:["Нульова собівартість копії","Пасивний дохід","Глобальний масштаб"],
+    cons:["Потрібен маркетинг","Час на створення","Висока конкуренція"] },
+  { id:"saas", name:"SaaS / Платформа", emoji:"⚙️", category:"Технології", entry:4, capital:4, time:5, scale:5, b1:2,b2:4,b3:5,
+    tagline:"Софт за підпискою — щомісячний дохід", money:"$10k–100k+ (розробка, команда)",
+    forwho:"Технічним засновникам або тим, хто бачить чітку проблему бізнесу й може зібрати команду.",
+    start:"Зроби MVP (мінімальну версію) під одну болючу проблему. Знайди 10 платних користувачів до масштабу.",
+    mistake:"Будувати багато функцій одразу. Один продукт, одна проблема, один сегмент — спочатку.",
+    examples:"CRM, бухгалтерія, HR-система, аналітика",
+    pros:["Рекурентний дохід","Дуже висока маржа","Масштаб майже безкоштовний"],
+    cons:["Дорога розробка","Потрібна тех-команда","Довгий шлях до прибутку"] },
+  { id:"hardware", name:"Hardware / Deep Tech", emoji:"🔬", category:"Технології", entry:5, capital:5, time:5, scale:5, b1:1,b2:5,b3:5,
+    tagline:"Фізичний інноваційний продукт + технологія", money:"$50k–кілька млн (R&D, прототипи, сертифікація)",
+    forwho:"Командам з технічною/науковою експертизою, які вирішують велику проблему й готові до довгого циклу.",
+    start:"Прототип → тести з реальними користувачами → залучення грантів/інвестицій → серійне виробництво.",
+    mistake:"Недооцінити час і гроші на сертифікацію та виробництво. Hardware завжди довше й дорожче, ніж здається.",
+    examples:"Медтех-пристрої, wellness-гаджети, робототехніка, IoT",
+    pros:["Висока цінність і захист (патенти)","Преміальне позиціювання","Великий ринок при успіху"],
+    cons:["Дуже капіталоємно","Довгий R&D і сертифікація","Складна логістика й виробництво"] },
+  { id:"marketplace", name:"Маркетплейс", emoji:"🔄", category:"Технології", entry:4, capital:4, time:5, scale:5, b1:2,b2:4,b3:5,
+    tagline:"З'єднуєш продавців і покупців за комісію", money:"$20k–100k+ (платформа + розгін обох боків)",
+    forwho:"Тим, хто бачить неефективний ринок, де покупці й продавці важко знаходять одне одного.",
+    start:"Запусти один бік ринку вручну (concierge), доки не набереш критичну масу. Не будуй усе одразу.",
+    mistake:"Намагатися наростити обидва боки одночасно. Спочатку — один бік, вручну, без платформи.",
+    examples:"Airbnb, Etsy, OLX, Uber, біржа фрилансу",
+    pros:["Не зберігаєш товар","Мережевий ефект","Дуже висока вартість бізнесу"],
+    cons:["Проблема курки і яйця","Складна платформа","Потрібна велика аудиторія"] },
+  { id:"franchise", name:"Франшиза (продавець)", emoji:"📍", category:"Масштабування", entry:3, capital:3, time:3, scale:5, b1:3,b2:3,b3:5,
+    tagline:"Продаєш свою готову бізнес-модель іншим", money:"$5k–30k (упаковка системи, юридика, бренд)",
+    forwho:"Власникам зрілого, прибуткового бізнесу з чіткими процесами, готовими до тиражування.",
+    start:"Спочатку доведи, що твоя одна точка стабільно прибуткова. Опиши всі процеси так, щоб їх повторив чужий.",
+    mistake:"Продавати франшизу до того, як власний бізнес став стабільно прибутковим і системним.",
+    examples:"Мережа кав'ярень, фастфуд, автомийки, навчальні центри",
+    pros:["Масштаб без власних грошей","Роялті — рекурентний дохід","Швидке зростання бренду"],
+    cons:["Потрібна зріла система","Контроль якості","Юридична складність"] },
+  { id:"subscription", name:"Підписна модель", emoji:"🔁", category:"Рекурентний дохід", entry:2, capital:2, time:4, scale:4, b1:4,b2:2,b3:4,
+    tagline:"Клієнти платять регулярно за цінність", money:"$500–10k (залежить від типу)",
+    forwho:"Тим, хто може давати постійну цінність — контент, товар або сервіс на регулярній основі.",
+    start:"Запусти з невеликою групою перших підписників, збери фідбек, доведи що вони НЕ відписуються через місяць.",
+    mistake:"Фокус на залученні нових замість утримання. Churn (відтік) вбиває підписні бізнеси.",
+    examples:"Box-підписка, преміум-контент, клуб, ПЗ за підпискою",
+    pros:["Передбачуваний дохід","Лояльна база","Легше планувати"],
+    cons:["Треба постійно давати цінність","Churn — головний ворог","Складний перший підписник"] },
+  { id:"content", name:"Контент / Особистий бренд", emoji:"🎥", category:"Медіа", entry:1, capital:1, time:5, scale:4, b1:5,b2:1,b3:4,
+    tagline:"Будуєш аудиторію й монетизуєш її", money:"$0–500 (телефон + час)",
+    forwho:"Тим, хто має що сказати, готовий до публічності й може стабільно створювати контент роками.",
+    start:"Обери одну платформу й один формат. Випускай контент стабільно 90 днів, перш ніж робити висновки.",
+    mistake:"Гнатися за кількістю підписників замість залученості. 1000 фанів цінніші за 100k байдужих.",
+    examples:"YouTube, Instagram, подкаст, Telegram-канал, блог",
+    pros:["Майже нульовий старт","Особистий бренд = актив","Багато способів монетизації"],
+    cons:["Дуже довго рости","Алгоритми непередбачувані","Потрібна дисципліна роками"] },
+  { id:"community", name:"Ком'юніті / Клуб", emoji:"👥", category:"Рекурентний дохід", entry:2, capital:1, time:4, scale:4, b1:4,b2:1,b3:4,
+    tagline:"Об'єднуєш людей за інтересом і береш за членство", money:"$200–2000 (платформа + контент)",
+    forwho:"Тим, хто має репутацію в темі й може об'єднати людей навколо спільної мети чи цінності.",
+    start:"Збери безкоштовну групу, дай реальну цінність, і коли люди не хочуть йти — зроби платний рівень.",
+    mistake:"Зробити платний клуб до того, як є активна спільнота й довіра. Спочатку цінність — потім гроші.",
+    examples:"Закритий клуб підприємців, мастермайнд, нішева спільнота",
+    pros:["Мережевий ефект","Рекурентний дохід","Мінімальні витрати"],
+    cons:["Потрібна репутація","Активна модерація","Складно утримати активність"] },
+];
+const INVEST = [
+  { id:"savings", name:"Депозит / Накопичення", emoji:"🏦", category:"Консервативні", entry:1, capital:1, time:1, scale:1, b1:5,b2:1,b3:1,
+    tagline:"Гроші в банку під відсоток", money:"Від $100",
+    forwho:"Новачкам і тим, кому потрібна повна збереженість грошей і доступ до них будь-коли.",
+    start:"Відкрий депозит або накопичувальний рахунок. Це місце для подушки безпеки, а не для зростання капіталу.",
+    mistake:"Тримати ВСІ заощадження на депозиті. Інфляція повільно з'їдає купівельну спроможність.",
+    examples:"Банківський депозит, накопичувальний рахунок, ОВДП",
+    pros:["Майже нульовий ризик","Повна ліквідність","Зрозуміло й просто"],
+    cons:["Дохідність нижча за інфляцію","Гроші не працюють по-справжньому"] },
+  { id:"bonds", name:"Облігації", emoji:"📜", category:"Консервативні", entry:2, capital:2, time:1, scale:2, b1:4,b2:2,b3:2,
+    tagline:"Даєш у борг державі/компанії під відсоток", money:"Від $1,000",
+    forwho:"Тим, хто хоче стабільний передбачуваний дохід вищий за депозит, з помірним ризиком.",
+    start:"Почни з державних облігацій (найнадійніші), потім можна додати корпоративні з вищою дохідністю.",
+    mistake:"Гнатися за високою дохідністю корпоративних облігацій без оцінки ризику дефолту емітента.",
+    examples:"Держоблігації (ОВДП), корпоративні облігації, єврооблігації",
+    pros:["Передбачуваний дохід","Нижчий ризик ніж акції","Регулярні виплати"],
+    cons:["Невисока дохідність","Чутливі до ставок","Ризик дефолту емітента"] },
+  { id:"etf", name:"ETF / Індексні фонди", emoji:"📊", category:"Фондовий ринок", entry:1, capital:1, time:2, scale:3, b1:5,b2:1,b3:3,
+    tagline:"Купуєш весь ринок одним фондом", money:"Від $10–100",
+    forwho:"Майже всім — це найпростіший спосіб інвестувати в сотні компаній без аналізу кожної.",
+    start:"Відкрий брокерський рахунок, купуй широкий індексний ETF (напр. на S&P 500) регулярно щомісяця.",
+    mistake:"Намагатися «вгадати момент» для входу. Регулярні покупки незалежно від ціни працюють краще.",
+    examples:"S&P 500 ETF, MSCI World, секторальні ETF",
+    pros:["Миттєва диверсифікація","Низькі комісії","Не треба аналізувати компанії"],
+    cons:["Ринкова волатильність","Немає шансу «обіграти ринок»","Потрібне терпіння"] },
+  { id:"stocks", name:"Акції (окремі)", emoji:"📈", category:"Фондовий ринок", entry:2, capital:2, time:3, scale:4, b1:4,b2:2,b3:4,
+    tagline:"Купуєш частки конкретних компаній", money:"Від $100",
+    forwho:"Тим, хто готовий вивчати компанії, читати звіти й приймати на себе вищий ризик заради вищого доходу.",
+    start:"Почни з компаній, чий бізнес ти розумієш. Не вкладай більше 5-10% капіталу в одну акцію.",
+    mistake:"Вкладати все в одну «гарячу» акцію за порадою з інтернету без власного аналізу.",
+    examples:"Дивідендні акції (OMV, A1), tech-акції, blue chips",
+    pros:["Висока потенційна дохідність","Дивіденди","Контроль над вибором"],
+    cons:["Потрібен аналіз","Емоційно складно","Ризик втрати на окремих акціях"] },
+  { id:"dividend", name:"Дивідендний портфель", emoji:"💸", category:"Фондовий ринок", entry:2, capital:3, time:2, scale:3, b1:4,b2:3,b3:3,
+    tagline:"Акції, що регулярно платять дивіденди", money:"Від $5,000 (для відчутного потоку)",
+    forwho:"Тим, хто хоче побудувати пасивний грошовий потік і реінвестувати його для зростання.",
+    start:"Підбирай компанії зі стабільною історією виплат і реінвестуй дивіденди для ефекту складного відсотка.",
+    mistake:"Купувати акції лише через високу дивідендну дохідність — часто це сигнал проблем у компанії.",
+    examples:"Дивідендні аристократи, європейські blue chips, REIT",
+    pros:["Пасивний грошовий потік","Складний відсоток","Менша волатильність"],
+    cons:["Повільне зростання капіталу","Податки на дивіденди","Треба великий капітал"] },
+  { id:"realestate", name:"Нерухомість", emoji:"🏠", category:"Реальні активи", entry:4, capital:5, time:2, scale:3, b1:2,b2:5,b3:3,
+    tagline:"Купуєш нерухомість для оренди/перепродажу", money:"Від $30,000+ (або іпотека)",
+    forwho:"Тим, хто має значний капітал і хоче відчутний актив з пасивним доходом і захистом від інфляції.",
+    start:"Почни з однієї квартири під оренду в ліквідній локації. Прорахуй усі витрати, а не лише ціну купівлі.",
+    mistake:"Рахувати тільки орендний дохід, забуваючи про податки, ремонт, простої й управління.",
+    examples:"Квартира в оренду, комерційна нерухомість, фліппінг",
+    pros:["Фізичний актив","Пасивний дохід","Захист від інфляції"],
+    cons:["Великий вхідний капітал","Низька ліквідність","Витрати на управління"] },
+  { id:"reit", name:"REIT / Фонди нерухомості", emoji:"🏗️", category:"Реальні активи", entry:2, capital:2, time:2, scale:3, b1:4,b2:2,b3:3,
+    tagline:"Інвестуєш у нерухомість через біржу", money:"Від $100",
+    forwho:"Тим, хто хоче дохід від нерухомості без купівлі квартир, управління й великого капіталу.",
+    start:"Купуй REIT через брокера як звичайну акцію. Це нерухомість з ліквідністю фондового ринку.",
+    mistake:"Плутати REIT з безризиковим активом — вони теж падають у кризу нерухомості.",
+    examples:"Біржові REIT, фонди комерційної нерухомості",
+    pros:["Низький поріг входу","Ліквідність","Регулярні виплати"],
+    cons:["Ринкова волатильність","Чутливі до ставок","Менше контролю"] },
+  { id:"gold", name:"Золото / Сировина", emoji:"🥇", category:"Реальні активи", entry:2, capital:2, time:1, scale:2, b1:4,b2:2,b3:2,
+    tagline:"Захисний актив проти криз та інфляції", money:"Від $100",
+    forwho:"Тим, хто хоче частину капіталу в захисному активі, що зберігає вартість у нестабільні часи.",
+    start:"Тримай 5-10% портфеля в золоті (через ETF або фізичне) як страховку, а не як основну інвестицію.",
+    mistake:"Вкладати велику частину капіталу в золото — воно зберігає, але не примножує капітал.",
+    examples:"Золоті ETF, фізичне золото, сировинні фонди",
+    pros:["Захист у кризу","Зберігає вартість","Не залежить від компаній"],
+    cons:["Не дає доходу","Може довго стояти на місці","Витрати на зберігання"] },
+  { id:"crypto", name:"Криптовалюта", emoji:"₿", category:"Альтернативні", entry:2, capital:2, time:3, scale:5, b1:4,b2:2,b3:5,
+    tagline:"Цифрові активи з високим ризиком/доходом", money:"Від $10",
+    forwho:"Тим, хто розуміє технологію, готовий до екстремальної волатильності й вкладає лише ті гроші, що не шкода втратити.",
+    start:"Почни з провідних монет (BTC, ETH) на надійній біржі. Не вкладай більше 5-10% капіталу.",
+    mistake:"Вкладати на емоціях під час хайпу й продавати в паніці на падінні. І гнатися за «новою монетою».",
+    examples:"Bitcoin, Ethereum, стейкінг, DeFi",
+    pros:["Дуже висока потенційна дохідність","Доступно з малих сум","Працює 24/7"],
+    cons:["Екстремальна волатильність","Регуляторні ризики","Ризик шахрайства"] },
+  { id:"p2p", name:"P2P-кредитування", emoji:"🤝", category:"Альтернативні", entry:2, capital:2, time:2, scale:3, b1:4,b2:2,b3:3,
+    tagline:"Даєш позики людям/бізнесу під відсоток", money:"Від $50–500",
+    forwho:"Тим, хто хоче вищий за депозит дохід і готовий до ризику неповернення частини позик.",
+    start:"Розподіли суму між багатьма дрібними позиками на перевірених платформах, щоб знизити ризик.",
+    mistake:"Вкласти все в кілька великих позик. Диверсифікація між позичальниками — головне правило.",
+    examples:"P2P-платформи кредитування, краудлендинг",
+    pros:["Вищий дохід за депозит","Низький поріг входу","Регулярні виплати"],
+    cons:["Ризик дефолту позичальника","Платформні ризики","Низька ліквідність"] },
+  { id:"angel", name:"Бізнес-ангел", emoji:"😇", category:"Венчур / Стартапи", entry:4, capital:4, time:4, scale:5, b1:2,b2:4,b3:5,
+    tagline:"Вкладаєш у ранні стартапи за частку", money:"Від $5,000–50,000 за угоду",
+    forwho:"Досвідченим людям з капіталом і експертизою, готовим втратити вкладене заради рідкісних великих виграшів.",
+    start:"Інвестуй лише частину капіталу, яку готовий втратити. Заходь у кілька стартапів, не в один. Шукай синдикати ангелів.",
+    mistake:"Вкласти все в один стартап «з гарною ідеєю». 9 з 10 стартапів не злітають — диверсифікація обов'язкова.",
+    examples:"Ранні раунди стартапів, ангельські синдикати, AngelList",
+    pros:["Величезний потенціал (10-100x)","Вплив на компанію","Доступ до інновацій"],
+    cons:["Дуже високий ризик втрати","Низька ліквідність (роки)","Потрібна експертиза"] },
+  { id:"vc", name:"Venture Capital (фонд)", emoji:"🚀", category:"Венчур / Стартапи", entry:5, capital:5, time:5, scale:5, b1:1,b2:5,b3:5,
+    tagline:"Вкладаєш у венчурний фонд, що інвестує в стартапи", money:"Від $50,000–250,000+ (як LP)",
+    forwho:"Квартал-інвесторам і Family Office з великим капіталом, які хочуть венчурну експозицію без власного відбору угод.",
+    start:"Заходь як LP (партнер з обмеженою відповідальністю) у фонд із хорошим track record. Це довга гра на 7-10 років.",
+    mistake:"Недооцінити термін. Гроші заморожені на роки, а більшість доходу — від кількох найкращих компаній фонду.",
+    examples:"Venture-фонди, fund-of-funds, мікро-VC",
+    pros:["Професійний відбір угод","Диверсифікація по стартапах","Доступ до топ-угод"],
+    cons:["Дуже високий поріг входу","Гроші заморожені на роки","Високі комісії фонду"] },
+  { id:"pe", name:"Private Equity", emoji:"💼", category:"Венчур / Стартапи", entry:5, capital:5, time:5, scale:4, b1:1,b2:5,b3:4,
+    tagline:"Інвестиції в зрілі приватні компанії", money:"Від $100,000+",
+    forwho:"Дуже заможним інвесторам і інституціям, які хочуть володіти частками зрілих прибуткових компаній.",
+    start:"Доступ зазвичай через фонди PE як LP. Потрібен значний капітал і довгий горизонт.",
+    mistake:"Очікувати ліквідності. PE — це роки заморожених грошей в обмін на потенційно вищий дохід.",
+    examples:"Buyout-фонди, growth equity, фонди викупу",
+    pros:["Стабільніше за венчур","Зрілі компанії","Високий потенціал доходу"],
+    cons:["Дуже високий поріг","Багаторічне заморожування","Тільки для кваліфікованих"] },
+  { id:"familyoffice", name:"Family Office", emoji:"🏛️", category:"Управління капіталом", entry:5, capital:5, time:3, scale:4, b1:1,b2:5,b3:4,
+    tagline:"Особистий «штаб» з управління великим капіталом родини", money:"Від $5–10 млн+ капіталу",
+    forwho:"Заможним родинам, які хочуть професійне комплексне управління активами, податками й спадщиною.",
+    start:"Спочатку multi-family office (спільний на кілька родин) — дешевше. Власний має сенс від десятків мільйонів.",
+    mistake:"Створювати власний офіс зарано. Утримання команди коштує дорого — спочатку аутсорс або multi-family.",
+    examples:"Single-family office, multi-family office, приватний банкінг",
+    pros:["Повний контроль і кастомізація","Управління спадщиною","Доступ до ексклюзивних угод"],
+    cons:["Потрібен величезний капітал","Дорого утримувати","Складна структура"] },
+  { id:"businessbuy", name:"Купівля готового бізнесу", emoji:"🔑", category:"Управління капіталом", entry:4, capital:5, time:3, scale:4, b1:2,b2:5,b3:4,
+    tagline:"Купуєш діючий прибутковий бізнес", money:"Від $20,000–500,000+",
+    forwho:"Тим, хто хоче одразу прибуток без старту з нуля й готовий керувати або найняти управителя.",
+    start:"Шукай бізнес зі стабільним грошовим потоком і зрозумілими процесами. Перевір фінанси перш ніж купувати (due diligence).",
+    mistake:"Купити бізнес, що тримається на власнику. Без нього клієнти й дохід можуть зникнути.",
+    examples:"Купівля кав'ярні, онлайн-бізнесу, сервісної компанії",
+    pros:["Одразу грошовий потік","Готові клієнти й процеси","Швидше за старт з нуля"],
+    cons:["Потрібен капітал","Ризик прихованих проблем","Може триматися на старому власнику"] },
+];
+const QUIZ_BUILD = [
+  { id:"capital", emoji:"💰", question:"Скільки стартового капіталу готов(а) вкласти?",
+    options:[
+      {label:"Майже нічого — починаю з нуля", value:1},
+      {label:"До $5,000", value:2},
+      {label:"$5k–$50k", value:3},
+      {label:"$50k+", value:4},
+    ]},
+  { id:"time", emoji:"⏱️", question:"Коли хочеш побачити перші гроші?",
+    options:[
+      {label:"Якнайшвидше — тиждень-місяць", value:1},
+      {label:"За 3–6 місяців", value:2},
+      {label:"6–12 місяців", value:3},
+      {label:"Можу чекати 1–2+ роки", value:4},
+    ]},
+  { id:"style", emoji:"🧠", question:"Як хочеш проводити більшість часу?",
+    options:[
+      {label:"Спілкуватися, продавати, переконувати", value:"people"},
+      {label:"Створювати: писати, знімати, робити руками", value:"create"},
+      {label:"Управляти командою і процесами", value:"manage"},
+      {label:"Будувати продукт / технологію", value:"build"},
+    ]},
+  { id:"risk", emoji:"🎲", question:"Яке ставлення до ризику?",
+    options:[
+      {label:"Хочу стабільність", value:1},
+      {label:"Готов(а) до злетів і падінь", value:2},
+      {label:"Люблю ризик заради великого потенціалу", value:3},
+    ]},
+  { id:"goal", emoji:"🚀", question:"Яка ціль через 5 років?",
+    options:[
+      {label:"Свобода — $5–10k/місяць на себе", value:1},
+      {label:"Середній бізнес із командою", value:2},
+      {label:"Масштабна компанія / продаж бізнесу", value:3},
+      {label:"Пасивний дохід", value:4},
+    ]},
+];
+
+const QUIZ_INVEST = [
+  { id:"capital", emoji:"💰", question:"Який капітал готов(а) інвестувати?",
+    options:[
+      {label:"До $1,000 — починаю вчитися", value:1},
+      {label:"$1k–$20k", value:2},
+      {label:"$20k–$100k", value:3},
+      {label:"$100k+", value:4},
+    ]},
+  { id:"risk", emoji:"🎲", question:"Як ставишся до ризику втрати?",
+    options:[
+      {label:"Збереження понад усе — мінімум ризику", value:1},
+      {label:"Помірний ризик заради росту", value:2},
+      {label:"Готов(а) ризикнути заради високого доходу", value:3},
+      {label:"Можу втратити частину заради 10-100x", value:4},
+    ]},
+  { id:"horizon", emoji:"📅", question:"На який термін вкладаєш?",
+    options:[
+      {label:"Можу знадобитися будь-коли", value:1},
+      {label:"1–3 роки", value:2},
+      {label:"3–7 років", value:3},
+      {label:"7+ років, гроші не потрібні скоро", value:4},
+    ]},
+  { id:"involvement", emoji:"🛠️", question:"Наскільки хочеш бути залученим(ою)?",
+    options:[
+      {label:"Зовсім пасивно — вклав і забув", value:"passive"},
+      {label:"Періодично слідкувати й коригувати", value:"semi"},
+      {label:"Активно вивчати й обирати угоди", value:"active"},
+    ]},
+  { id:"goal", emoji:"🎯", question:"Головна ціль інвестування?",
+    options:[
+      {label:"Зберегти й захистити від інфляції", value:"preserve"},
+      {label:"Стабільний пасивний дохід", value:"income"},
+      {label:"Максимальне зростання капіталу", value:"growth"},
+      {label:"Доступ до інновацій і стартапів", value:"venture"},
+    ]},
+];
+
+// ---- STATE ----
+let activeTab='build', quizMode=null, quizStep=0, quizAnswers={}, quizDone=false;
+let filters={ build:{cat:'Всі',entry:0}, invest:{cat:'Всі',entry:0} };
+
+function showTab(t){
+  activeTab=t;
+  ['build','invest','quiz'].forEach(x=>document.getElementById('tab-'+x).classList.toggle('hidden',x!==t));
+  document.getElementById('tab-btn-build').classList.toggle('active',t==='build');
+  document.getElementById('tab-btn-invest').classList.remove('active');
+  document.getElementById('tab-btn-invest').classList.add('invest');
+  document.getElementById('tab-btn-invest').classList.toggle('active',t==='invest');
+  document.getElementById('tab-btn-quiz').classList.toggle('active',t==='quiz');
+  if(t==='quiz'){ resetQuizPath(); }
+}
+
+function dots(val,max,cls){ return Array.from({length:max},(_,i)=>`<div class="dot${i<val?' '+cls:''}"></div>`).join(''); }
+
+// ---- FILTERS ----
+function buildFilters(kind){
+  const data = kind==='build'?BUILD:INVEST;
+  const cats=['Всі',...new Set(data.map(m=>m.category))];
+  const f=filters[kind];
+  const inv = kind==='invest'?' invest':'';
+  const entryLabel = kind==='build'?'Легкий вхід':'Доступність';
+  document.getElementById('filters-'+kind).innerHTML =
+    cats.map(c=>`<button class="filter-btn${c===f.cat?' active'+inv:''}" onclick="setCat('${kind}','${c}')">${c}</button>`).join('') +
+    `<div class="filter-range"><label>${entryLabel}</label>
+      <input type="range" min="0" max="5" value="${f.entry}" oninput="setEntry('${kind}',this.value)">
+      <span id="entry-val-${kind}">${f.entry>0?f.entry+'+':'Всі'}</span></div>`;
+}
+function setCat(kind,c){ filters[kind].cat=c; buildFilters(kind); renderGrid(kind); }
+function setEntry(kind,v){ filters[kind].entry=+v; document.getElementById('entry-val-'+kind).textContent=v>0?v+'+':'Всі'; renderGrid(kind); }
+
+// ---- GRID ----
+function renderGrid(kind){
+  const data=kind==='build'?BUILD:INVEST;
+  const f=filters[kind];
+  const filtered=data.filter(m=>{
+    if(f.cat!=='Всі'&&m.category!==f.cat) return false;
+    if(f.entry>0&&m.b1<f.entry) return false;
+    return true;
+  });
+  const b3cls = kind==='build'?'on-gold':'on-teal';
+  const b3lab = kind==='build'?'Масштаб':'Дохідність';
+  document.getElementById('grid-'+kind).innerHTML = filtered.map(m=>`
+    <div class="model-card${kind==='invest'?' invest':''}" onclick="openModal('${kind}','${m.id}')">
+      <div class="card-top"><div class="card-emoji">${m.emoji}</div>
+        <div><div class="card-name">${m.name}</div><div class="card-cat${kind==='invest'?' invest':''}">${m.category}</div></div></div>
+      <div class="card-tagline">${m.tagline}</div>
+      <div class="card-money">💵 ${m.money}</div>
+      <div class="bars">
+        <div class="bar-row"><span class="bar-label">${kind==='build'?'Легкість входу':'Доступність'}</span><div class="bar-dots">${dots(m.b1,5,'on-green')}</div></div>
+        <div class="bar-row"><span class="bar-label">Капітал</span><div class="bar-dots">${dots(m.b2,5,'on-red')}</div></div>
+        <div class="bar-row"><span class="bar-label">${b3lab}</span><div class="bar-dots">${dots(m.b3,5,b3cls)}</div></div>
+      </div>
+    </div>`).join('');
+  document.getElementById('hint-'+kind).textContent = `Натисни на картку для деталей • ${filtered.length} варіантів`;
+}
+
+// ---- MODAL ----
+function openModal(kind,id){
+  const data=kind==='build'?BUILD:INVEST;
+  const m=data.find(x=>x.id===id);
+  const box=document.getElementById('modal-box');
+  box.classList.toggle('invest',kind==='invest');
+  document.getElementById('m-emoji').textContent=m.emoji;
+  document.getElementById('m-name').textContent=m.name;
+  const catEl=document.getElementById('m-cat'); catEl.textContent=m.category; catEl.classList.toggle('invest',kind==='invest');
+  document.getElementById('m-desc').textContent=m.tagline;
+  document.getElementById('m-money').textContent=m.money;
+  document.getElementById('m-forwho').textContent=m.forwho;
+  document.getElementById('m-start').textContent=m.start;
+  document.getElementById('m-mistake').textContent=m.mistake;
+  document.getElementById('m-examples').textContent=m.examples;
+  document.getElementById('m-pros').innerHTML=m.pros.map(p=>`<div class="pc-item">• ${p}</div>`).join('');
+  document.getElementById('m-cons').innerHTML=m.cons.map(c=>`<div class="pc-item">• ${c}</div>`).join('');
+  const b3cls=kind==='build'?'on-gold':'on-teal';
+  document.getElementById('m-bars').innerHTML=[
+    {label:kind==='build'?'Легкість входу':'Доступність',val:m.b1,cls:'on-green'},
+    {label:'Капіталоємність',val:m.b2,cls:'on-red'},
+    {label:'Час до результату',val:m.time,cls:'on-blue'},
+    {label:kind==='build'?'Потенціал масштабу':'Потенційна дохідність',val:m.b3,cls:b3cls},
+  ].map(b=>`<div class="modal-bar-row"><span class="modal-bar-label">${b.label}</span><div class="bar-dots">${dots(b.val,5,b.cls)}</div></div>`).join('');
+  document.getElementById('modal-overlay').classList.remove('hidden');
+}
+function closeModal(){ document.getElementById('modal-overlay').classList.add('hidden'); }
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeModal(); });
+
+// ---- QUIZ ----
+function resetQuizPath(){
+  quizMode=null; quizStep=0; quizAnswers={}; quizDone=false;
+  document.getElementById('quiz-path').classList.remove('hidden');
+  document.getElementById('quiz-active').classList.add('hidden');
+}
+function startQuiz(mode){
+  quizMode=mode; quizStep=0; quizAnswers={}; quizDone=false;
+  document.getElementById('quiz-path').classList.add('hidden');
+  document.getElementById('quiz-active').classList.remove('hidden');
+  renderQuiz();
+}
+function getQuizQs(){ return quizMode==='build'?QUIZ_BUILD:QUIZ_INVEST; }
+
+function renderQuiz(){
+  if(quizDone){ renderResults(); return; }
+  const Q=getQuizQs(); const q=Q[quizStep];
+  const pct=Math.round((quizStep/Q.length)*100);
+  document.getElementById('quiz-inner').innerHTML=`
+    <div class="quiz-progress-wrap">
+      <div class="quiz-progress-top"><span class="quiz-progress-label">Питання ${quizStep+1} з ${Q.length}</span><span class="quiz-progress-pct">${pct}%</span></div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+    </div>
+    <div class="quiz-q-wrap"><div class="quiz-emoji">${q.emoji}</div><div class="quiz-question">${q.question}</div></div>
+    <div class="quiz-options">
+      ${q.options.map(opt=>`<button class="quiz-option" onclick='answerQuiz("${q.id}",${JSON.stringify(opt.value)},this)'>${opt.label}</button>`).join('')}
+    </div>
+    <button class="quiz-back" onclick="${quizStep>0?'quizBack()':'resetQuizPath()'}">← ${quizStep>0?'назад':'до вибору напряму'}</button>`;
+}
+function answerQuiz(qId,value,el){
+  el.classList.add('selected'); quizAnswers[qId]=value;
+  const Q=getQuizQs();
+  setTimeout(()=>{ if(quizStep<Q.length-1){quizStep++;renderQuiz();}else{quizDone=true;renderResults();} },280);
+}
+function quizBack(){ quizStep=Math.max(0,quizStep-1); renderQuiz(); }
+
+function calcBuild(){
+  const a=quizAnswers; const cap=a.capital||2,time=a.time||2,goal=a.goal||2,risk=a.risk||2,style=a.style;
+  return BUILD.map(m=>{ let s=0;
+    if(m.b2<=cap+1)s+=3; if(m.b2<=cap)s+=2;
+    if(m.time<=time+1)s+=2; if(m.time<=time)s+=2;
+    if(goal===1&&m.b3<=3)s+=2; if(goal===2&&m.b3>=2&&m.b3<=4)s+=2; if(goal===3&&m.b3>=4)s+=3;
+    if(goal===4&&['subscription','content','digital-product','community'].includes(m.id))s+=3;
+    if(style==='people'&&['freelance','coaching','agency','shop','community'].includes(m.id))s+=3;
+    if(style==='create'&&['handmade','content','digital-product','coaching'].includes(m.id))s+=3;
+    if(style==='manage'&&['agency','franchise','marketplace','shop','production'].includes(m.id))s+=3;
+    if(style==='build'&&['saas','hardware','digital-product','marketplace','production'].includes(m.id))s+=3;
+    if(risk===1&&m.entry<=2)s+=2; if(risk===2&&m.entry>=2&&m.entry<=4)s+=2; if(risk===3&&m.entry>=3)s+=2;
+    return {...m,_s:s}; }).sort((x,y)=>y._s-x._s).slice(0,4);
+}
+function calcInvest(){
+  const a=quizAnswers; const cap=a.capital||2,risk=a.risk||2,hor=a.horizon||2,inv=a.involvement,goal=a.goal;
+  return INVEST.map(m=>{ let s=0;
+    if(m.b2<=cap+1)s+=3; if(m.b2<=cap)s+=2;
+    if(risk===1&&m.b3<=2)s+=3; if(risk===2&&m.b3>=2&&m.b3<=3)s+=2; if(risk===3&&m.b3>=3)s+=2; if(risk===4&&m.b3>=4)s+=3;
+    if(hor===1&&m.time<=1)s+=3; if(hor===2&&m.time<=2)s+=2; if(hor===3&&m.time<=3)s+=2; if(hor===4&&m.time>=3)s+=2;
+    if(inv==='passive'&&['savings','bonds','etf','reit','gold','vc','familyoffice'].includes(m.id))s+=3;
+    if(inv==='semi'&&['dividend','stocks','realestate','crypto','p2p'].includes(m.id))s+=3;
+    if(inv==='active'&&['stocks','angel','businessbuy','crypto','realestate'].includes(m.id))s+=3;
+    if(goal==='preserve'&&['savings','bonds','gold','etf'].includes(m.id))s+=3;
+    if(goal==='income'&&['dividend','bonds','realestate','reit','p2p'].includes(m.id))s+=3;
+    if(goal==='growth'&&['stocks','etf','crypto','realestate'].includes(m.id))s+=3;
+    if(goal==='venture'&&['angel','vc','pe','businessbuy'].includes(m.id))s+=3;
+    return {...m,_s:s}; }).sort((x,y)=>y._s-x._s).slice(0,4);
+}
+function renderResults(){
+  const results=quizMode==='build'?calcBuild():calcInvest();
+  const isInv=quizMode==='invest';
+  document.getElementById('quiz-inner').innerHTML=`
+    <div class="results-header"><div class="results-emoji">🎯</div>
+      <div class="results-title">Твої топ-${results.length}</div>
+      <div class="results-sub">${isInv?'Інвестиційні стратегії':'Бізнес-моделі'} під твої відповіді • натисни для деталей</div></div>
+    <div class="results-grid">
+      ${results.map((m,i)=>`<div class="result-card${i===0?' top':''}" onclick="openModal('${quizMode}','${m.id}')">
+        ${i===0?'<div class="result-badge">⭐ НАЙКРАЩЕ</div>':''}
+        <div class="result-emoji">${m.emoji}</div><div class="result-name">${m.name}</div>
+        <div class="result-desc">${m.tagline}</div>
+        <div class="card-money" style="margin-top:10px">💵 ${m.money}</div></div>`).join('')}
+    </div>
+    <div class="results-btns">
+      <button class="btn-secondary" onclick="resetQuizPath()">↩ Пройти знову</button>
+      <button class="btn-primary" onclick="showTab('${quizMode}')">📋 Усі ${isInv?'інвестиції':'моделі'}</button>
+    </div>`;
+}
+
+// INIT
+buildFilters('build'); renderGrid('build');
+buildFilters('invest'); renderGrid('invest');
+</script>
+</body>
+</html>
